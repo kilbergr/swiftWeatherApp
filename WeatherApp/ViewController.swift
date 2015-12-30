@@ -41,21 +41,39 @@ class ViewController: UIViewController {
         let task = NSURLSession.sharedSession().dataTaskWithURL(url) { (data, response, error) -> Void in
             if let urlContent = data {
                 
-                let webContent = NSString(data: urlContent, encoding: NSUTF8StringEncoding)!
+                let webContent = NSString(data: urlContent, encoding: NSUTF8StringEncoding)
                 
-                let splitIt = webContent.componentsSeparatedByString("3 Day Weather Forecast Summary:</b><span class=\"read-more-small\"><span class=\"read-more-content\"> <span class=\"phrase\">")[1]
+                //splitting to find the part of interest
                 
-                let stringOfInterest = splitIt.componentsSeparatedByString("</span></span></span></p><div class=\"forecast-cont\"><div class=\"units-cont\"><a class=\"units metric active\">")[0]
+                var splitIt = webContent?.componentsSeparatedByString("3 Day Weather Forecast Summary:")
                 
-                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                //checking to make sure that it exists in the string and we haven't reached some weird place
+                if splitIt!.count > 1 {
+                    let prefixRemoved = splitIt![1]
                     
-                        self.searchResults.text = saveTheCity + " 1 – 3 Day Weather Forecast Summary: " + stringOfInterest
-                       
-                    })
+                    let arrayOfInterest = prefixRemoved.componentsSeparatedByString("</span>")
+                    let finalArray = arrayOfInterest[0].componentsSeparatedByString("phrase\">")
+                    
+                    if arrayOfInterest.count > 1 {
+                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                            
+                            self.searchResults.text = saveTheCity + " 1 – 3 Day Weather Forecast Summary: " + finalArray[1]
+                            
+                        })
+                    }
+                    else {
+                        self.searchResults.text = "I'm sorry, there's been an error. Try a different city."
+                    }
+                }
+                //error handling
+                else {
+                        self.searchResults.text = "I'm sorry, there's been an error. Try a different city."
+                }
             }
                 
             else {
                 print(error)
+                self.searchResults.text = "I'm sorry, it looks like we're having trouble connecting right now. Try again later."
             }
         }
         task.resume()
