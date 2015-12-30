@@ -57,7 +57,7 @@ class ViewController: UIViewController {
                     if arrayOfInterest.count > 1 {
                         dispatch_async(dispatch_get_main_queue(), { () -> Void in
                             
-                            self.searchResults.text = saveTheCity + " 1 – 3 Day Weather Forecast Summary: " + finalArray[1]
+                            self.searchResults.text = saveTheCity + " 1 – 3 Day Weather Forecast Summary: " + (finalArray[1].stringByReplacingOccurrencesOfString("&deg;", withString: "°"))
                             
                         })
                     }
